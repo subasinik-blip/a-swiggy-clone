@@ -15,12 +15,6 @@ pipeline {
             }
         }
 
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/subasinik-blip/a-swiggy-clone.git'
-            }
-        }
-
         stage('Install Dependencies') {
             steps {
                 sh 'npm install'
