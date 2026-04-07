@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    options {
+        skipDefaultCheckout(true)
+    }
+
     environment {
         SONAR_TOKEN = credentials('sonar-token')
         SONAR_ORG = 'subasinik-blip'
@@ -15,7 +19,7 @@ pipeline {
             }
         }
 
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
                 checkout scm
             }
@@ -29,33 +33,33 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'npm run build || echo "No build script found"'
+                sh 'npm run build || echo "No build step"'
             }
         }
 
-        stage('SonarCloud Analysis') {
+        stage('SonarCloud Scan') {
             steps {
                 sh '''
                 docker run --rm \
-                  -e SONAR_HOST_URL=https://sonarcloud.io \
-                  -e SONAR_LOGIN=$SONAR_TOKEN \
-                  sonarsource/sonar-scanner-cli \
-                  -Dsonar.projectKey=$SONAR_PROJECT_KEY \
-                  -Dsonar.organization=$SONAR_ORG \
-                  -Dsonar.sources=.
+                -e SONAR_HOST_URL=https://sonarcloud.io \
+                -e SONAR_LOGIN=$SONAR_TOKEN \
+                sonarsource/sonar-scanner-cli \
+                -Dsonar.projectKey=$SONAR_PROJECT_KEY \
+                -Dsonar.organization=$SONAR_ORG \
+                -Dsonar.sources=.
                 '''
             }
         }
 
-        stage('TRIVY FS SCAN') {
+        stage('Trivy Scan') {
             steps {
-                sh 'trivy fs . > trivyfs.txt'
+                sh 'trivy fs . > trivy-report.txt || true'
             }
         }
 
         stage('Deploy') {
             steps {
-                echo "Add your deploy steps here"
+                echo "Deployment step placeholder"
             }
         }
     }
