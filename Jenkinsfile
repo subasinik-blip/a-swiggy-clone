@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        nodejs 'node16'
-    }
-
     environment {
         SONAR_TOKEN = credentials('sonar-token')
         SONAR_ORG = 'subasinik-blip'
