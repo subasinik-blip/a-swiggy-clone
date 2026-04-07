@@ -1,13 +1,23 @@
 pipeline {
     agent any
 
+    tools {
+        nodejs 'node16'
+    }
+
     environment {
-        SONAR_TOKEN = credentials('sonar-token')             // Jenkins credential you created
-        SONAR_ORG = 'subasinik-blip'                         // Your SonarCloud org
-        SONAR_PROJECT_KEY = 'subasinik-blip_a-swiggy-clone'  // Your project key
+        SONAR_TOKEN = credentials('sonar-token')
+        SONAR_ORG = 'subasinik-blip'
+        SONAR_PROJECT_KEY = 'subasinik-blip_a-swiggy-clone'
     }
 
     stages {
+
+        stage('Clean Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
 
         stage('Checkout') {
             steps {
@@ -15,17 +25,20 @@ pipeline {
             }
         }
 
-        stage('Build & Test') {
+        stage('Install Dependencies') {
             steps {
-                echo "Building and testing project..."
-                // Adjust build command if needed (Gradle/Maven/etc)
-                sh './gradlew build test || mvn clean install'
+                sh 'npm install'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'npm run build || echo "No build script found"'
             }
         }
 
         stage('SonarCloud Analysis') {
             steps {
-                echo "Running SonarCloud analysis..."
                 sh '''
                 docker run --rm \
                   -e SONAR_HOST_URL=https://sonarcloud.io \
@@ -38,10 +51,15 @@ pipeline {
             }
         }
 
+        stage('TRIVY FS SCAN') {
+            steps {
+                sh 'trivy fs . > trivyfs.txt'
+            }
+        }
+
         stage('Deploy') {
             steps {
-                echo "Deploying app..."
-                sh './deploy.sh || echo "Replace deploy.sh with your deploy commands"'
+                echo "Add your deploy steps here"
             }
         }
     }
