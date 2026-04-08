@@ -54,6 +54,10 @@ pipeline {
                 sh '''
                 docker stop swiggy-container || true
                 docker rm swiggy-container || true
+
+                docker ps -q --filter "publish=3000" | xargs -r docker stop
+                docker ps -aq --filter "publish=3000" | xargs -r docker rm
+
                 docker run -d -p 3000:3000 --name swiggy-container swiggy-clone
                 '''
             }
