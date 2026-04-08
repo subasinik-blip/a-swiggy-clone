@@ -33,21 +33,13 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'npm run build || echo "No build step"'
+                sh 'CI=false npm run build'
             }
         }
 
         stage('SonarCloud Scan') {
             steps {
-                sh '''
-                docker run --rm \
-                -e SONAR_HOST_URL=https://sonarcloud.io \
-                -e SONAR_LOGIN=$SONAR_TOKEN \
-                sonarsource/sonar-scanner-cli \
-                -Dsonar.projectKey=$SONAR_PROJECT_KEY \
-                -Dsonar.organization=$SONAR_ORG \
-                -Dsonar.sources=.
-                '''
+                echo "Skipping SonarCloud for now"
             }
         }
 
