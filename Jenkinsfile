@@ -55,11 +55,9 @@ stages {
         steps {
             script {
                 withDockerRegistry(credentialsId: 'dockerhub', toolName: 'docker') {
-
                     sh 'docker build -t swiggy-clone .'
                     sh 'docker tag swiggy-clone subasinik-blip/swiggy-clone:latest'
                     sh 'docker push subasinik-blip/swiggy-clone:latest'
-
                 }
             }
         }
