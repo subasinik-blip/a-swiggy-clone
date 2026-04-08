@@ -38,15 +38,9 @@ stages {
         }
     }
 
-    stage('SonarCloud Scan') {
+    stage('Trivy Scan') {
         steps {
-            echo "Skipping SonarCloud for now"
-        }
-    }
-
-    stage('Trivy FS Scan') {
-        steps {
-            sh 'trivy fs . > trivyfs.txt || true'
+            sh 'trivy fs . > trivy.txt || true'
         }
     }
 
@@ -61,7 +55,6 @@ stages {
             sh '''
             docker stop swiggy-container || true
             docker rm swiggy-container || true
-
             docker run -d -p 3000:3000 --name swiggy-container swiggy-clone
             '''
         }
