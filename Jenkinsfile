@@ -60,15 +60,19 @@ stages {
 
     stage('Deploy to Kubernetes') {
         steps {
-            sh '''
-            kubectl get deployment swiggy || kubectl create deployment swiggy --image=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_NAME:latest
+            script {
+                withKubeConfig(credentialsId: 'kubernetes') {
+                    sh '''
+                    kubectl get deployment swiggy || kubectl create deployment swiggy --image=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_NAME:latest
 
-            kubectl set image deployment/swiggy swiggy=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_NAME:latest || true
+                    kubectl set image deployment/swiggy swiggy=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_NAME:latest || true
 
-            kubectl get svc swiggy || kubectl expose deployment swiggy --type=NodePort --port=80 --target-port=3000
+                    kubectl get svc swiggy || kubectl expose deployment swiggy --type=NodePort --port=80 --target-port=3000
 
-            kubectl rollout status deployment/swiggy
-            '''
+                    kubectl rollout status deployment/swiggy
+                    '''
+                }
+            }
         }
     }
 }
